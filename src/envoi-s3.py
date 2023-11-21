@@ -9,6 +9,7 @@ import sys
 logger = logging.Logger('envoi-s3')
 logger.setLevel(logging.WARN)
 
+
 def augment_s4cmd_arguments(cmd_args):
     """
     Augments the given cmd_args list with necessary arguments to configure s4cmd.
@@ -40,7 +41,13 @@ def augment_s5cmd_arguments(cmd_args):
     pass
 
 
-def s4cmd_wrapper(cmd_args, *args):
+def s4cmd_wrapper(cmd_args):
+    """
+    Wrapper function for running the s4cmd command with supplied arguments.
+
+    :param cmd_args: List of command line arguments to be pass to s4cmd.
+    :return: Process object representing the completed command.
+    """
     cmd_args = augment_s4cmd_arguments(cmd_args)
 
     # Create the s4cmd command
@@ -52,15 +59,12 @@ def s4cmd_wrapper(cmd_args, *args):
     return process
 
 
-def s5cmd_wrapper(cmd_args, *args):
+def s5cmd_wrapper(cmd_args):
     """
     Wrapper function for running the s5cmd command with supplied arguments.
 
     :param cmd_args: A list of additional arguments to pass to the s5cmd command.
-    :param args: Additional positional arguments to be passed to augment_s4cmd_arguments() function.
-    :return: None
-
-    This function takes a list of additional command line arguments (cmd_args) and optional positional arguments (args). It calls the augment_s4cmd_arguments() function to modify the cmd_args list if necessary. Then, it creates the s5cmd command by concatenating the 's5cmd' string with cmd_args. Finally, it runs the command using the subprocess.run() function, with the 'check=True' parameter to raise an exception if the command fails.
+    :return: Process object representing the completed command.
     """
     cmd_args = augment_s4cmd_arguments(cmd_args)
 
@@ -72,12 +76,14 @@ def s5cmd_wrapper(cmd_args, *args):
 
     return process
 
+
 def parse_command_line(cli_args):
     parser = optparse.OptionParser(
         description='Envoi S3 Command Line Utility',
     )
 
-    parser.add_option('--client', dest='client_name', default='s5cmd', help='The client to use when communicating with S3.')
+    parser.add_option('--client', dest='client_name', default='s5cmd',
+                      help='The client to use when communicating with S3.')
     (opt, args) = parser.parse_args(cli_args)
     return opt, args
 
@@ -95,7 +101,10 @@ def determine_first_executable_command(commands):
     :param commands: a list of commands to check for executability
     :return: the first command from the list that is executable
 
-    This method takes a list of commands as input and returns the first command from the list that is executable on the operating system. It checks if each command is executable using the shutil.which() function. If a command is found to be executable, it is returned immediately, otherwise the next command is checked. If none of the commands are found to be executable, None is returned.
+    This method takes a list of commands as input and returns the first command from the list that is executable on the
+    operating system. It checks if each command is executable using the shutil.which() function. If a command is found
+    to be executable, it is returned immediately, otherwise the next command is checked. If none of the commands are
+    found to be executable, None is returned.
 
     Example usage:
 
@@ -107,9 +116,12 @@ def determine_first_executable_command(commands):
         else:
             print("No executable command found.")
 
-    The determine_first_executable_command() method depends on the shutil module, which provides the which() function for checking if a command is executable. Additionally, this method also depends on the os module for retrieving the operating system environment.
+    The determine_first_executable_command() method depends on the shutil module, which provides the which() function
+    for checking if a command is executable. Additionally, this method also depends on the os module for retrieving the
+    operating system environment.
 
-    Note: This method does not handle cases where a command requires a different syntax or additional arguments to be executed successfully. Its purpose is to simply determine if a command is executable or not.
+    Note: This method does not handle cases where a command requires a different syntax or additional arguments to be
+    executed successfully. Its purpose is to simply determine if a command is executable or not.
     """
     for cmd in commands:
         if shutil.which(cmd) is not None:
