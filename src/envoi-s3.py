@@ -139,7 +139,9 @@ def execute_client(client_name, cli_args):
         if process:
             exit_code = process.returncode
 
-
+    except Exception as e:
+        logger.error(f"Error running client {client_name}: {str(e)}")
+        exit_code = 1
 
     return exit_code
 
