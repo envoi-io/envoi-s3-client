@@ -15,7 +15,7 @@ ln -s src/envoi-s3.py /usr/local/bin/envoi-s3
 
 ## Prerequisites
 
-- A supported S3 client, either [s4cmd](https://github.com/bloomreach/s4cmd) or [s5cmd](https://github.com/peak/s5cmd)
+- A supported S3 client, either [aws cli](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html), [s4cmd](https://github.com/bloomreach/s4cmd), or [s5cmd](https://github.com/peak/s5cmd)
 
 ## Usage
 
@@ -34,4 +34,4 @@ Upload local files using a S3 client.
 
 #### `--client CLIENT`
 
-Client can be either`s4cmd` or `s5cmd`. 
+Client can be any one of `aws`, `s4cmd`, or `s5cmd`. 
