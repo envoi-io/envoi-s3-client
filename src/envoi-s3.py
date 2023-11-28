@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+
+import boto3
 import logging
 import optparse
 import os
@@ -124,6 +126,9 @@ def parse_command_line(cli_args, env_vars):
 
     parser.add_option('--client', dest='client_name', default='s5cmd',
                       help='The client to use when communicating with S3.')
+    parser.add_option('--role-arn', dest='role_arn', default=None,
+                      help='The arn for the IAM Role to assume.')
+
     (opt, args) = parser.parse_args(cli_args)
     return opt, args, env_vars
 
@@ -168,12 +173,26 @@ def determine_first_executable_command(commands):
             return cmd
 
 
+def assume_role_using_arn(role_arn, env_vars):
+    sts_client = boto3.client('sts')
+    assumed_role_object = sts_client.assume_role(
+        RoleArn=role_arn,
+        RoleSessionName='envoi-s3'
+    )
+    credentials = assumed_role_object['Credentials']
+    env_vars['AWS_ACCESS_KEY_ID'] = credentials['AccessKeyId']
+    env_vars['AWS_SECRET_ACCESS_KEY'] = credentials['SecretAccessKey']
+    env_vars['AWS_SESSION_TOKEN'] = credentials['SessionToken']
+    return env_vars
+
+
 def execute_client(client_name, cli_args, env_vars):
     """
     Execute a client based on the given client name and command-line arguments.
 
     :param client_name: The name of the client to execute ('aws', 's4cmd', or 's5cmd').
     :param cli_args: The command-line arguments to be passed to the client.
+    :param env_vars:
 
     :return: None
     """
@@ -215,6 +234,10 @@ def main():
     env_vars = os.environ.copy()
     (opts, remaining_args, env_vars) = parse_command_line(cli_args, env_vars)
     client_name = determine_client(opts)
+
+    role_arn = opts.role_arn
+    if role_arn:
+        env_vars = assume_role_using_arn(role_arn, env_vars)
 
     exit_code = execute_client(client_name, remaining_args, env_vars)
     if exit_code != 0:
