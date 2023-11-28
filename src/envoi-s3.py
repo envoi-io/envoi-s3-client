@@ -55,7 +55,7 @@ def augment_s4cmd_arguments(cmd_args, env_vars):
         if region is not None:
             cmd_args.extend(['--region', region])
 
-    return cmd_args
+    return cmd_args, env_vars
 
 
 def augment_s5cmd_arguments(cmd_args, env_vars):
