@@ -34,4 +34,8 @@ Upload local files using a S3 client.
 
 #### `--client CLIENT`
 
-Client can be any one of `aws`, `s4cmd`, or `s5cmd`. 
+Client can be any one of `aws`, `s4cmd`, or `s5cmd`.
+
+#### `--role-arn ROLE_ARN`
+
+An ARN that identifies the role to assume
